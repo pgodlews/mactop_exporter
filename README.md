@@ -6,11 +6,11 @@ A comprehensive [Grafana](https://grafana.com/) dashboard for **Apple Silicon Ma
 
 ## Features
 
-48 panels across 9 sections:
+49 panels across 9 sections:
 
 | Section | What you get |
 |---|---|
-| **CPU** | Per-core utilisation (P-cores / E-cores), cluster frequencies |
+| **CPU** | Per-core utilisation, cluster utilisation (P-cores · E-cores · S-cores), cluster trends & thermals |
 | **GPU** | 40-cell grid utilisation, GPU frequency |
 | **Memory** | RAM & swap usage, memory bandwidth |
 | **Power** | Per-rail wattage (CPU · GPU · ANE · DRAM · System · Total) |

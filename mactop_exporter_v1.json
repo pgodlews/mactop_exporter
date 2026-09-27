@@ -27,7 +27,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Apple Silicon Mac \u2014 chip model, P/S/E core counts, GPU cores. Sourced from mactop_system_info labels.",
+      "description": "Apple Silicon Mac \u2014 chip model, P/E/S core counts, GPU cores, unified memory. Sourced from mactop_system_info and mactop_memory_gb.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -79,9 +79,9 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "mactop_system_info{job=~\"$job\",instance=~\"$instance\"}",
+          "expr": "label_replace(\n  label_replace(\n    label_replace(\n      label_replace(\n        label_join(mactop_system_info{job=~\"$job\",instance=~\"$instance\"}, \"core_layout\", \",\", \"p_core_count\", \"e_core_count\", \"s_core_count\"),\n        \"cores_desc\", \"${1}\", \"core_count\", \"(.*)\"\n      ),\n      \"cores_desc\", \"${1}P + ${2}E + ${3}S\", \"core_layout\", \"([1-9][0-9]*),([1-9][0-9]*),([1-9][0-9]*)\"\n    ),\n    \"cores_desc\", \"${1}P + ${2}S\", \"core_layout\", \"([1-9][0-9]*),0,([1-9][0-9]*)\"\n  ),\n  \"cores_desc\", \"${1}P + ${2}E\", \"core_layout\", \"([1-9][0-9]*),([1-9][0-9]*),0\"\n)",
           "instant": true,
-          "legendFormat": "{{model}}  \u00b7  {{p_core_count}}P + {{s_core_count}}S cores  \u00b7  {{gpu_core_count}}-core GPU  \u00b7  128 GB unified memory",
+          "legendFormat": "{{model}}  \u00b7  {{cores_desc}} cores  \u00b7  {{gpu_core_count}}-core GPU  \u00b7  ${memory_total} GB unified memory",
           "refId": "A"
         }
       ],
@@ -593,7 +593,7 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 4,
+        "w": 3,
         "x": 0,
         "y": 8
       },
@@ -673,8 +673,8 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 4,
-        "x": 4,
+        "w": 3,
+        "x": 3,
         "y": 8
       },
       "id": 211,
@@ -720,7 +720,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Super cluster \u2014 6 mid-tier cores (M5 Pro/Max only, shows 0 on other chips).",
+      "description": "Efficiency cluster \u2014 low-power cores (M1\u2013M4 and base models, shows 0 on M5 Pro/Max).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -753,8 +753,88 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 4,
-        "x": 8,
+        "w": 3,
+        "x": 6,
+        "y": 8
+      },
+      "id": 217,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 32
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_ecore_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
+          "instant": false,
+          "legendFormat": "E-Cores",
+          "refId": "A"
+        }
+      ],
+      "title": "E-Cores",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Super cluster \u2014 mid-tier cores (M5 Pro/Max only, shows 0 on other chips).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#44c77a",
+                "value": 0
+              },
+              {
+                "color": "#e8a838",
+                "value": 70
+              },
+              {
+                "color": "#e05252",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 9,
         "y": 8
       },
       "id": 212,
@@ -882,7 +962,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "CPU total, P-core, and S-core utilisation over time.",
+      "description": "CPU total, P-core, E-core, and S-core utilisation over time.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -974,6 +1054,21 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "E-Cores"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#44c77a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
               "options": "S-Cores"
             },
             "properties": [
@@ -1038,10 +1133,20 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "mactop_score_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
+          "expr": "mactop_ecore_usage_percent{job=~\"$job\",instance=~\"$instance\"} and on(instance, job) (mactop_system_info{job=~\"$job\",instance=~\"$instance\",e_core_count!=\"0\"} == 1)",
+          "instant": false,
+          "legendFormat": "E-Cores",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_score_usage_percent{job=~\"$job\",instance=~\"$instance\"} and on(instance, job) (mactop_system_info{job=~\"$job\",instance=~\"$instance\",s_core_count!=\"0\"} == 1)",
           "instant": false,
           "legendFormat": "S-Cores",
-          "refId": "C"
+          "refId": "D"
         }
       ],
       "title": "CPU Cluster Trends",
@@ -1052,7 +1157,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Hottest P-core and S-core sensor readings. Threshold at 85 \u00b0C (throttle risk) and 95 \u00b0C (critical).",
+      "description": "Hottest P-core, E-core, and S-core sensor readings. Threshold at 85 \u00b0C (throttle risk) and 95 \u00b0C (critical).",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1131,6 +1236,21 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "Max E-Core"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#44c77a",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
               "options": "Max S-Core"
             },
             "properties": [
@@ -1200,10 +1320,20 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
+          "expr": "max(mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"CPU E-Core.*\"})",
+          "instant": false,
+          "legendFormat": "Max E-Core",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
           "expr": "max(mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"CPU S-Core.*\"})",
           "instant": false,
           "legendFormat": "Max S-Core",
-          "refId": "B"
+          "refId": "C"
         },
         {
           "datasource": {
@@ -1213,7 +1343,7 @@
           "expr": "mactop_soc_temp_celsius{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
           "legendFormat": "SoC",
-          "refId": "C"
+          "refId": "D"
         }
       ],
       "title": "CPU Temperature",
@@ -4311,6 +4441,31 @@
         "refresh": 2,
         "regex": "",
         "regexApplyTo": "value",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "128",
+          "value": "128"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "query_result(mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"total\"})",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "memory_total",
+        "query": {
+          "query": "query_result(mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"total\"})",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "/(?:\\}|mactop_memory_gb) +([0-9]+)/",
+        "skipUrlSync": false,
         "sort": 1,
         "type": "query"
       }
