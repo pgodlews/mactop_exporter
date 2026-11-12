@@ -50,7 +50,7 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 24,
+        "w": 18,
         "x": 0,
         "y": 0
       },
@@ -81,11 +81,82 @@
           },
           "expr": "label_replace(\n  label_replace(\n    label_replace(\n      label_replace(\n        label_join(mactop_system_info{job=~\"$job\",instance=~\"$instance\"}, \"core_layout\", \",\", \"p_core_count\", \"e_core_count\", \"s_core_count\"),\n        \"cores_desc\", \"${1}\", \"core_count\", \"(.*)\"\n      ),\n      \"cores_desc\", \"${1}P + ${2}E + ${3}S\", \"core_layout\", \"([1-9][0-9]*),([1-9][0-9]*),([1-9][0-9]*)\"\n    ),\n    \"cores_desc\", \"${1}P + ${2}S\", \"core_layout\", \"([1-9][0-9]*),0,([1-9][0-9]*)\"\n  ),\n  \"cores_desc\", \"${1}P + ${2}E\", \"core_layout\", \"([1-9][0-9]*),([1-9][0-9]*),0\"\n)",
           "instant": true,
-          "legendFormat": "{{model}}  \u00b7  {{cores_desc}} cores  \u00b7  {{gpu_core_count}}-core GPU  \u00b7  ${memory_total} GB unified memory",
+          "legendFormat": "{{model}} \u00b7 {{cores_desc}} cores \u00b7 {{gpu_core_count}}-core GPU \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
       "title": "System",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "gbytes",
+          "min": 0,
+          "mappings": [],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5aa9ff"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#5aa9ff",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 3
+      },
+      "id": 207,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 40
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"total\"}",
+          "instant": true,
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "Unified Memory",
       "type": "stat"
     },
     {
@@ -156,7 +227,7 @@
           },
           "expr": "mactop_cpu_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "Total CPU",
+          "legendFormat": "Total CPU \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -231,7 +302,7 @@
           },
           "expr": "mactop_gpu_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "GPU",
+          "legendFormat": "GPU \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -306,7 +377,7 @@
           },
           "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"used\"} / ignoring(type) mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"total\"} * 100",
           "instant": false,
-          "legendFormat": "Memory",
+          "legendFormat": "Memory \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -372,7 +443,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"total\"}",
           "instant": false,
-          "legendFormat": "Total",
+          "legendFormat": "Total \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -446,7 +517,7 @@
           },
           "expr": "mactop_soc_temp_celsius{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "SoC",
+          "legendFormat": "SoC \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -482,6 +553,10 @@
                 "3": {
                   "color": "#e05252",
                   "text": "Critical"
+                },
+                "4": {
+                  "text": "Sleeping",
+                  "color": "gray"
                 }
               },
               "type": "value"
@@ -534,7 +609,7 @@
           },
           "expr": "mactop_thermal_state{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "State",
+          "legendFormat": "State \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -628,7 +703,7 @@
           },
           "expr": "mactop_cpu_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "CPU",
+          "legendFormat": "CPU \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -708,7 +783,7 @@
           },
           "expr": "mactop_pcore_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "P-Cores",
+          "legendFormat": "P-Cores \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -788,7 +863,7 @@
           },
           "expr": "mactop_ecore_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "E-Cores",
+          "legendFormat": "E-Cores \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -868,7 +943,7 @@
           },
           "expr": "mactop_score_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "S-Cores",
+          "legendFormat": "S-Cores \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -950,7 +1025,7 @@
           },
           "expr": "sort_desc(mactop_cpu_core_usage_percent{job=~\"$job\",instance=~\"$instance\"})",
           "instant": true,
-          "legendFormat": "Core {{core}} ({{type}})",
+          "legendFormat": "Core {{core}} ({{type}}) \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -1019,8 +1094,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Total"
+              "id": "byRegexp",
+              "options": "^Total \u00b7 .*$"
             },
             "properties": [
               {
@@ -1038,8 +1113,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "P-Cores"
+              "id": "byRegexp",
+              "options": "^P\\-Cores \u00b7 .*$"
             },
             "properties": [
               {
@@ -1053,8 +1128,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "E-Cores"
+              "id": "byRegexp",
+              "options": "^E\\-Cores \u00b7 .*$"
             },
             "properties": [
               {
@@ -1068,8 +1143,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "S-Cores"
+              "id": "byRegexp",
+              "options": "^S\\-Cores \u00b7 .*$"
             },
             "properties": [
               {
@@ -1115,7 +1190,7 @@
           },
           "expr": "mactop_cpu_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "Total",
+          "legendFormat": "Total \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -1125,7 +1200,7 @@
           },
           "expr": "mactop_pcore_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "P-Cores",
+          "legendFormat": "P-Cores \u00b7 {{instance}}",
           "refId": "B"
         },
         {
@@ -1135,7 +1210,7 @@
           },
           "expr": "mactop_ecore_usage_percent{job=~\"$job\",instance=~\"$instance\"} and on(instance, job) (mactop_system_info{job=~\"$job\",instance=~\"$instance\",e_core_count!=\"0\"} == 1)",
           "instant": false,
-          "legendFormat": "E-Cores",
+          "legendFormat": "E-Cores \u00b7 {{instance}}",
           "refId": "C"
         },
         {
@@ -1145,7 +1220,7 @@
           },
           "expr": "mactop_score_usage_percent{job=~\"$job\",instance=~\"$instance\"} and on(instance, job) (mactop_system_info{job=~\"$job\",instance=~\"$instance\",s_core_count!=\"0\"} == 1)",
           "instant": false,
-          "legendFormat": "S-Cores",
+          "legendFormat": "S-Cores \u00b7 {{instance}}",
           "refId": "D"
         }
       ],
@@ -1220,8 +1295,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Max P-Core"
+              "id": "byRegexp",
+              "options": "^Max\\ P\\-Core \u00b7 .*$"
             },
             "properties": [
               {
@@ -1235,8 +1310,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Max E-Core"
+              "id": "byRegexp",
+              "options": "^Max\\ E\\-Core \u00b7 .*$"
             },
             "properties": [
               {
@@ -1250,8 +1325,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Max S-Core"
+              "id": "byRegexp",
+              "options": "^Max\\ S\\-Core \u00b7 .*$"
             },
             "properties": [
               {
@@ -1265,8 +1340,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "SoC"
+              "id": "byRegexp",
+              "options": "^SoC \u00b7 .*$"
             },
             "properties": [
               {
@@ -1310,9 +1385,9 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max(mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"CPU P-Core.*\"})",
+          "expr": "max by (job, instance) (mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"CPU P-Core.*\"})",
           "instant": false,
-          "legendFormat": "Max P-Core",
+          "legendFormat": "Max P-Core \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -1320,9 +1395,9 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max(mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"CPU E-Core.*\"})",
+          "expr": "max by (job, instance) (mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"CPU E-Core.*\"})",
           "instant": false,
-          "legendFormat": "Max E-Core",
+          "legendFormat": "Max E-Core \u00b7 {{instance}}",
           "refId": "B"
         },
         {
@@ -1330,9 +1405,9 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max(mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"CPU S-Core.*\"})",
+          "expr": "max by (job, instance) (mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"CPU S-Core.*\"})",
           "instant": false,
-          "legendFormat": "Max S-Core",
+          "legendFormat": "Max S-Core \u00b7 {{instance}}",
           "refId": "C"
         },
         {
@@ -1342,7 +1417,7 @@
           },
           "expr": "mactop_soc_temp_celsius{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "SoC",
+          "legendFormat": "SoC \u00b7 {{instance}}",
           "refId": "D"
         }
       ],
@@ -1409,8 +1484,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "CPU"
+              "id": "byRegexp",
+              "options": "^CPU \u00b7 .*$"
             },
             "properties": [
               {
@@ -1428,8 +1503,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "DRAM"
+              "id": "byRegexp",
+              "options": "^DRAM \u00b7 .*$"
             },
             "properties": [
               {
@@ -1475,7 +1550,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"cpu\"}",
           "instant": false,
-          "legendFormat": "CPU",
+          "legendFormat": "CPU \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -1485,7 +1560,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"dram\"}",
           "instant": false,
-          "legendFormat": "DRAM",
+          "legendFormat": "DRAM \u00b7 {{instance}}",
           "refId": "B"
         }
       ],
@@ -1579,7 +1654,7 @@
           },
           "expr": "mactop_gpu_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "GPU",
+          "legendFormat": "GPU \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -1648,7 +1723,7 @@
           },
           "expr": "mactop_gpu_freq_mhz{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "Freq",
+          "legendFormat": "Freq \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -1726,7 +1801,7 @@
           },
           "expr": "mactop_gpu_temp_celsius{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "GPU Temp",
+          "legendFormat": "GPU Temp \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -1796,7 +1871,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"gpu\"}",
           "instant": false,
-          "legendFormat": "GPU",
+          "legendFormat": "GPU \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -1863,8 +1938,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Usage %"
+              "id": "byRegexp",
+              "options": "^Usage\\ % \u00b7 .*$"
             },
             "properties": [
               {
@@ -1878,8 +1953,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Freq MHz"
+              "id": "byRegexp",
+              "options": "^Freq\\ MHz \u00b7 .*$"
             },
             "properties": [
               {
@@ -1933,7 +2008,7 @@
           },
           "expr": "mactop_gpu_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "Usage %",
+          "legendFormat": "Usage % \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -1943,7 +2018,7 @@
           },
           "expr": "mactop_gpu_freq_mhz{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "Freq MHz",
+          "legendFormat": "Freq MHz \u00b7 {{instance}}",
           "refId": "B"
         }
       ],
@@ -1968,7 +2043,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "RAM used in GB out of total unified memory. Apple Silicon CPU, GPU and ANE share this pool.\n\n\u26a0\ufe0f Memory breakdown (app/wired/cached) not available from mactop \u2014 only total used is exposed.",
+      "description": "Used and total unified memory in GiB.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1984,7 +2059,7 @@
               }
             ]
           },
-          "unit": "decgbytes"
+          "unit": "gbytes"
         },
         "overrides": []
       },
@@ -2021,7 +2096,7 @@
           },
           "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"used\"}",
           "instant": false,
-          "legendFormat": "Used",
+          "legendFormat": "Used \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -2031,7 +2106,7 @@
           },
           "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"total\"}",
           "instant": false,
-          "legendFormat": "Total",
+          "legendFormat": "Total \u00b7 {{instance}}",
           "refId": "B"
         }
       ],
@@ -2104,7 +2179,7 @@
           },
           "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"used\"} / ignoring(type) mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"total\"} * 100",
           "instant": false,
-          "legendFormat": "RAM",
+          "legendFormat": "RAM \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -2116,7 +2191,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Swap used / total. Apple Silicon writes swap to internal NVMe \u2014 high swap causes latency and SSD wear.\n\n\u26a0\ufe0f Swap rate and compressed memory not available from mactop.",
+      "description": "Used and total swap in GiB. Compressed memory appears in its own panel.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2132,7 +2207,7 @@
               }
             ]
           },
-          "unit": "decgbytes"
+          "unit": "gbytes"
         },
         "overrides": []
       },
@@ -2169,7 +2244,7 @@
           },
           "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"swap_used\"}",
           "instant": false,
-          "legendFormat": "Used",
+          "legendFormat": "Used \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -2179,7 +2254,7 @@
           },
           "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"swap_total\"}",
           "instant": false,
-          "legendFormat": "Total",
+          "legendFormat": "Total \u00b7 {{instance}}",
           "refId": "B"
         }
       ],
@@ -2246,8 +2321,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Combined"
+              "id": "byRegexp",
+              "options": "^Combined \u00b7 .*$"
             },
             "properties": [
               {
@@ -2265,8 +2340,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Read"
+              "id": "byRegexp",
+              "options": "^Read \u00b7 .*$"
             },
             "properties": [
               {
@@ -2280,8 +2355,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Write"
+              "id": "byRegexp",
+              "options": "^Write \u00b7 .*$"
             },
             "properties": [
               {
@@ -2327,7 +2402,7 @@
           },
           "expr": "mactop_dram_bandwidth_gbs{job=~\"$job\",instance=~\"$instance\",direction=\"combined\"}",
           "instant": false,
-          "legendFormat": "Combined",
+          "legendFormat": "Combined \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -2337,7 +2412,7 @@
           },
           "expr": "mactop_dram_bandwidth_gbs{job=~\"$job\",instance=~\"$instance\",direction=\"read\"}",
           "instant": false,
-          "legendFormat": "Read",
+          "legendFormat": "Read \u00b7 {{instance}}",
           "refId": "B"
         },
         {
@@ -2347,7 +2422,7 @@
           },
           "expr": "mactop_dram_bandwidth_gbs{job=~\"$job\",instance=~\"$instance\",direction=\"write\"}",
           "instant": false,
-          "legendFormat": "Write",
+          "legendFormat": "Write \u00b7 {{instance}}",
           "refId": "C"
         }
       ],
@@ -2409,13 +2484,13 @@
               }
             ]
           },
-          "unit": "decgbytes"
+          "unit": "gbytes"
         },
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Total RAM"
+              "id": "byRegexp",
+              "options": "^Total\\ RAM \u00b7 .*$"
             },
             "properties": [
               {
@@ -2447,8 +2522,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Used RAM"
+              "id": "byRegexp",
+              "options": "^Used\\ RAM \u00b7 .*$"
             },
             "properties": [
               {
@@ -2462,8 +2537,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Swap Used"
+              "id": "byRegexp",
+              "options": "^Swap\\ Used \u00b7 .*$"
             },
             "properties": [
               {
@@ -2509,7 +2584,7 @@
           },
           "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"total\"}",
           "instant": false,
-          "legendFormat": "Total RAM",
+          "legendFormat": "Total RAM \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -2519,7 +2594,7 @@
           },
           "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"used\"}",
           "instant": false,
-          "legendFormat": "Used RAM",
+          "legendFormat": "Used RAM \u00b7 {{instance}}",
           "refId": "B"
         },
         {
@@ -2529,7 +2604,7 @@
           },
           "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"swap_used\"}",
           "instant": false,
-          "legendFormat": "Swap Used",
+          "legendFormat": "Swap Used \u00b7 {{instance}}",
           "refId": "C"
         }
       ],
@@ -2537,12 +2612,248 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": 0,
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Unknown",
+                  "color": "gray"
+                },
+                "1": {
+                  "text": "Normal",
+                  "color": "green"
+                },
+                "2": {
+                  "text": "Warning",
+                  "color": "orange"
+                },
+                "4": {
+                  "text": "Critical",
+                  "color": "red"
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5aa9ff"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#5aa9ff",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 37,
+        "w": 8,
+        "h": 5
+      },
+      "id": 235,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 40
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_memory_pressure_level{job=~\"$job\",instance=~\"$instance\"}",
+          "instant": true,
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "Memory Pressure",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Approximate score derived from kernel pressure, usage, swap and compression.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "mappings": [],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5aa9ff"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#5aa9ff",
+                "value": null
+              }
+            ]
+          },
+          "max": 100
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 37,
+        "w": 8,
+        "h": 5
+      },
+      "id": 236,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 40
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_memory_pressure_approx{job=~\"$job\",instance=~\"$instance\"}",
+          "instant": true,
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "Memory Pressure Estimate",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "gbytes",
+          "min": 0,
+          "mappings": [],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5aa9ff"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#5aa9ff",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 37,
+        "w": 8,
+        "h": 5
+      },
+      "id": 237,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 40
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"compressed\"}",
+          "instant": true,
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "Compressed Memory",
+      "type": "stat"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 42
       },
       "id": 239,
       "panels": [],
@@ -2554,33 +2865,24 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Total system power vs M5 Max TDP (92 W). Gauge fills as load increases.",
+      "description": "Total system power in watts. Gauge scale follows the observed values.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
           "mappings": [],
-          "max": 100,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "#44c77a",
-                "value": 0
-              },
-              {
-                "color": "#e8a838",
-                "value": 35
-              },
-              {
-                "color": "#e05252",
-                "value": 75
+                "color": "#5aa9ff",
+                "value": null
               }
             ]
           },
-          "unit": "percent"
+          "unit": "watt"
         },
         "overrides": []
       },
@@ -2588,7 +2890,7 @@
         "h": 8,
         "w": 6,
         "x": 0,
-        "y": 38
+        "y": 43
       },
       "id": 240,
       "options": {
@@ -2616,9 +2918,9 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"total\"} / 92 * 100",
+          "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"total\"}",
           "instant": false,
-          "legendFormat": "Power %",
+          "legendFormat": "Power % \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -2663,7 +2965,7 @@
         "h": 8,
         "w": 18,
         "x": 6,
-        "y": 38
+        "y": 43
       },
       "id": 242,
       "options": {
@@ -2699,7 +3001,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\"}",
           "instant": true,
-          "legendFormat": "{{component}}",
+          "legendFormat": "{{component}} \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -2736,7 +3038,7 @@
         "h": 6,
         "w": 6,
         "x": 0,
-        "y": 46
+        "y": 51
       },
       "id": 241,
       "options": {
@@ -2769,7 +3071,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"total\"}",
           "instant": false,
-          "legendFormat": "Total",
+          "legendFormat": "Total \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -2836,8 +3138,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Total"
+              "id": "byRegexp",
+              "options": "^Total \u00b7 .*$"
             },
             "properties": [
               {
@@ -2855,8 +3157,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "CPU"
+              "id": "byRegexp",
+              "options": "^CPU \u00b7 .*$"
             },
             "properties": [
               {
@@ -2870,8 +3172,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "GPU"
+              "id": "byRegexp",
+              "options": "^GPU \u00b7 .*$"
             },
             "properties": [
               {
@@ -2885,8 +3187,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "ANE"
+              "id": "byRegexp",
+              "options": "^ANE \u00b7 .*$"
             },
             "properties": [
               {
@@ -2904,7 +3206,7 @@
         "h": 6,
         "w": 18,
         "x": 6,
-        "y": 46
+        "y": 51
       },
       "id": 243,
       "options": {
@@ -2932,7 +3234,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"total\"}",
           "instant": false,
-          "legendFormat": "Total",
+          "legendFormat": "Total \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -2942,7 +3244,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"system\"}",
           "instant": false,
-          "legendFormat": "System",
+          "legendFormat": "System \u00b7 {{instance}}",
           "refId": "B"
         },
         {
@@ -2952,7 +3254,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"cpu\"}",
           "instant": false,
-          "legendFormat": "CPU",
+          "legendFormat": "CPU \u00b7 {{instance}}",
           "refId": "C"
         },
         {
@@ -2962,7 +3264,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"gpu\"}",
           "instant": false,
-          "legendFormat": "GPU",
+          "legendFormat": "GPU \u00b7 {{instance}}",
           "refId": "D"
         },
         {
@@ -2972,7 +3274,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"dram\"}",
           "instant": false,
-          "legendFormat": "DRAM",
+          "legendFormat": "DRAM \u00b7 {{instance}}",
           "refId": "E"
         },
         {
@@ -2982,7 +3284,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"ane\"}",
           "instant": false,
-          "legendFormat": "ANE",
+          "legendFormat": "ANE \u00b7 {{instance}}",
           "refId": "F"
         }
       ],
@@ -2990,12 +3292,176 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "min": 0,
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "Battery"
+                },
+                "1": {
+                  "text": "AC power"
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5aa9ff"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#5aa9ff",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 57,
+        "w": 12,
+        "h": 5
+      },
+      "id": 244,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 40
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_power_supply_on_ac{job=~\"$job\",instance=~\"$instance\"}",
+          "instant": true,
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "Power Source",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Reported adapter rating. Hardware without a reported rating displays Unavailable.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watt",
+          "min": 0,
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable",
+                  "color": "gray"
+                }
+              }
+            }
+          ],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5aa9ff"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#5aa9ff",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 57,
+        "w": 12,
+        "h": 5
+      },
+      "id": 245,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 40
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_power_supply_adapter_watts{job=~\"$job\",instance=~\"$instance\"}",
+          "instant": true,
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "Power Adapter Rating",
+      "type": "stat"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 52
+        "y": 62
       },
       "id": 290,
       "panels": [],
@@ -3028,7 +3494,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 53
+        "y": 63
       },
       "id": 291,
       "options": {
@@ -3081,7 +3547,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component!=\"total\",component!=\"gpu_sram\"}",
           "interval": "15s",
-          "legendFormat": "{{component}}",
+          "legendFormat": "{{component}} \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -3114,7 +3580,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 53
+        "y": 63
       },
       "id": 292,
       "options": {
@@ -3176,7 +3642,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component!=\"total\",component!=\"gpu_sram\"}",
           "interval": "15s",
-          "legendFormat": "{{component}}",
+          "legendFormat": "{{component}} \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -3189,7 +3655,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 63
+        "y": 73
       },
       "id": 249,
       "panels": [],
@@ -3235,7 +3701,7 @@
         "h": 10,
         "w": 14,
         "x": 0,
-        "y": 64
+        "y": 74
       },
       "id": 250,
       "options": {
@@ -3271,7 +3737,7 @@
           },
           "expr": "sort_desc(mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"(CPU P-Core 06|CPU P-Core 16|CPU P-Core 0A|CPU P-Core 1A|CPU Die Mb|CPU Die DX|CPU Core HP|VRM MX|VRM mS|VRM D0|VRM DA|VRM DG|VRM DM|VRM DP|GPU DX|SoC Package DX|Memory VR|NVMe.*|Ambient OL)\"})",
           "instant": true,
-          "legendFormat": "{{name}}",
+          "legendFormat": "{{name}} \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -3346,8 +3812,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Max P-Core"
+              "id": "byRegexp",
+              "options": "^Max\\ P\\-Core \u00b7 .*$"
             },
             "properties": [
               {
@@ -3367,8 +3833,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "SoC"
+              "id": "byRegexp",
+              "options": "^SoC \u00b7 .*$"
             },
             "properties": [
               {
@@ -3382,8 +3848,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "GPU"
+              "id": "byRegexp",
+              "options": "^GPU \u00b7 .*$"
             },
             "properties": [
               {
@@ -3397,8 +3863,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Ambient"
+              "id": "byRegexp",
+              "options": "^Ambient \u00b7 .*$"
             },
             "properties": [
               {
@@ -3416,7 +3882,7 @@
         "h": 10,
         "w": 7,
         "x": 14,
-        "y": 64
+        "y": 74
       },
       "id": 251,
       "options": {
@@ -3444,7 +3910,7 @@
           },
           "expr": "mactop_soc_temp_celsius{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "SoC",
+          "legendFormat": "SoC \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -3454,7 +3920,7 @@
           },
           "expr": "mactop_gpu_temp_celsius{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "GPU",
+          "legendFormat": "GPU \u00b7 {{instance}}",
           "refId": "B"
         },
         {
@@ -3462,9 +3928,9 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max(mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"CPU P-Core.*\"})",
+          "expr": "max by (job, instance) (mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",name=~\"CPU P-Core.*\"})",
           "instant": false,
-          "legendFormat": "Max P-Core",
+          "legendFormat": "Max P-Core \u00b7 {{instance}}",
           "refId": "C"
         },
         {
@@ -3474,7 +3940,7 @@
           },
           "expr": "mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\",key=\"TAOL\"}",
           "instant": false,
-          "legendFormat": "Ambient",
+          "legendFormat": "Ambient \u00b7 {{instance}}",
           "refId": "D"
         }
       ],
@@ -3486,13 +3952,23 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Fan speed in RPM. MacBook Air: 0 RPM is correct \u2014 passively cooled. Fan blades on the design indicate fans.",
+      "description": "Fan speed in RPM. An unreadable tachometer reports Unavailable. Fanless hardware may expose no fan series.",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": {
+                  "text": "Unavailable",
+                  "color": "gray"
+                }
+              }
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -3510,7 +3986,7 @@
         "h": 10,
         "w": 3,
         "x": 21,
-        "y": 64
+        "y": 74
       },
       "id": 252,
       "options": {
@@ -3539,7 +4015,7 @@
           },
           "expr": "mactop_fan_rpm{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "{{fan_name}}",
+          "legendFormat": "{{fan_name}} \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -3552,7 +4028,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 74
+        "y": 84
       },
       "id": 280,
       "panels": [],
@@ -3585,7 +4061,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 75
+        "y": 85
       },
       "id": 281,
       "options": {
@@ -3647,7 +4123,7 @@
           },
           "expr": "mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\"}",
           "interval": "30s",
-          "legendFormat": "{{name}}",
+          "legendFormat": "{{name}} \u00b7 {{instance}}",
           "refId": "A"
         }
       ],
@@ -3698,7 +4174,7 @@
         "h": 18,
         "w": 24,
         "x": 0,
-        "y": 87
+        "y": 97
       },
       "id": 282,
       "options": {
@@ -3739,7 +4215,7 @@
           },
           "expr": "sort_desc(topk(60, mactop_temp_sensor_celsius{job=~\"$job\",instance=~\"$instance\"}))",
           "instant": true,
-          "legendFormat": "{{name}}",
+          "legendFormat": "{{name}} \u00b7 {{instance}}",
           "range": false,
           "refId": "A"
         }
@@ -3753,7 +4229,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 105
+        "y": 115
       },
       "id": 259,
       "panels": [],
@@ -3820,8 +4296,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Read"
+              "id": "byRegexp",
+              "options": "^Read \u00b7 .*$"
             },
             "properties": [
               {
@@ -3835,8 +4311,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Write"
+              "id": "byRegexp",
+              "options": "^Write \u00b7 .*$"
             },
             "properties": [
               {
@@ -3854,7 +4330,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 106
+        "y": 116
       },
       "id": 260,
       "options": {
@@ -3882,7 +4358,7 @@
           },
           "expr": "mactop_disk_kbytes_per_sec{job=~\"$job\",instance=~\"$instance\",operation=\"read\"} * 1024",
           "instant": false,
-          "legendFormat": "Read",
+          "legendFormat": "Read \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -3892,7 +4368,7 @@
           },
           "expr": "mactop_disk_kbytes_per_sec{job=~\"$job\",instance=~\"$instance\",operation=\"write\"} * 1024",
           "instant": false,
-          "legendFormat": "Write",
+          "legendFormat": "Write \u00b7 {{instance}}",
           "refId": "B"
         }
       ],
@@ -3959,8 +4435,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Read IOPS"
+              "id": "byRegexp",
+              "options": "^Read\\ IOPS \u00b7 .*$"
             },
             "properties": [
               {
@@ -3974,8 +4450,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Write IOPS"
+              "id": "byRegexp",
+              "options": "^Write\\ IOPS \u00b7 .*$"
             },
             "properties": [
               {
@@ -3993,7 +4469,7 @@
         "h": 8,
         "w": 6,
         "x": 12,
-        "y": 106
+        "y": 116
       },
       "id": 261,
       "options": {
@@ -4021,7 +4497,7 @@
           },
           "expr": "mactop_disk_iops{job=~\"$job\",instance=~\"$instance\",operation=\"read\"}",
           "instant": false,
-          "legendFormat": "Read IOPS",
+          "legendFormat": "Read IOPS \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -4031,7 +4507,7 @@
           },
           "expr": "mactop_disk_iops{job=~\"$job\",instance=~\"$instance\",operation=\"write\"}",
           "instant": false,
-          "legendFormat": "Write IOPS",
+          "legendFormat": "Write IOPS \u00b7 {{instance}}",
           "refId": "B"
         }
       ],
@@ -4043,7 +4519,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Network throughput in bytes/sec (all interfaces).\n\n\u26a0\ufe0f Bug in mactop: mactop_network_kbytes_per_sec is actually in bytes/sec despite the metric name. This dashboard uses Bps unit accordingly.\n\n\u26a0\ufe0f Per-interface stats (en0, Wi-Fi) and daily totals not available from mactop.",
+      "description": "Network throughput across all interfaces. mactop v2.1.4+ exports KiB/s, converted here to bytes/s.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -4098,8 +4574,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "\u2193 Download"
+              "id": "byRegexp",
+              "options": "^\u2193\\ Download \u00b7 .*$"
             },
             "properties": [
               {
@@ -4113,8 +4589,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "\u2191 Upload"
+              "id": "byRegexp",
+              "options": "^\u2191\\ Upload \u00b7 .*$"
             },
             "properties": [
               {
@@ -4132,7 +4608,7 @@
         "h": 8,
         "w": 6,
         "x": 18,
-        "y": 106
+        "y": 116
       },
       "id": 262,
       "options": {
@@ -4158,9 +4634,9 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "mactop_network_kbytes_per_sec{job=~\"$job\",instance=~\"$instance\",direction=\"download\"}",
+          "expr": "mactop_network_kbytes_per_sec{job=~\"$job\",instance=~\"$instance\",direction=\"download\"} * 1024",
           "instant": false,
-          "legendFormat": "\u2193 Download",
+          "legendFormat": "\u2193 Download \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -4168,9 +4644,9 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "mactop_network_kbytes_per_sec{job=~\"$job\",instance=~\"$instance\",direction=\"upload\"}",
+          "expr": "mactop_network_kbytes_per_sec{job=~\"$job\",instance=~\"$instance\",direction=\"upload\"} * 1024",
           "instant": false,
-          "legendFormat": "\u2191 Upload",
+          "legendFormat": "\u2191 Upload \u00b7 {{instance}}",
           "refId": "B"
         }
       ],
@@ -4178,12 +4654,225 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "mappings": [],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5aa9ff"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#5aa9ff",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 124,
+        "w": 8,
+        "h": 5
+      },
+      "id": 263,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 40
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_listening_ports_total{job=~\"$job\",instance=~\"$instance\"}",
+          "instant": true,
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "Listening Ports",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Listening ports bound beyond localhost. Visibility depends on process permissions.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "mappings": [],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5aa9ff"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#5aa9ff",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 124,
+        "w": 8,
+        "h": 5
+      },
+      "id": 264,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 40
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_listening_ports_external{job=~\"$job\",instance=~\"$instance\"}",
+          "instant": true,
+          "refId": "A",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "Externally Bound Ports",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "mappings": [],
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5aa9ff"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#5aa9ff",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 124,
+        "w": 8,
+        "h": 5
+      },
+      "id": 265,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 11,
+          "valueSize": 40
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "mactop_listening_ports{job=~\"$job\",instance=~\"$instance\"}",
+          "instant": true,
+          "refId": "A",
+          "legendFormat": "{{protocol}} \u00b7 {{instance}}"
+        }
+      ],
+      "title": "Ports by Protocol",
+      "type": "stat"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 114
+        "y": 129
       },
       "id": 269,
       "panels": [],
@@ -4250,8 +4939,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "CPU %"
+              "id": "byRegexp",
+              "options": "^CPU\\ % \u00b7 .*$"
             },
             "properties": [
               {
@@ -4269,8 +4958,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "GPU %"
+              "id": "byRegexp",
+              "options": "^GPU\\ % \u00b7 .*$"
             },
             "properties": [
               {
@@ -4284,8 +4973,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Power W"
+              "id": "byRegexp",
+              "options": "^Power\\ W \u00b7 .*$"
             },
             "properties": [
               {
@@ -4321,7 +5010,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 115
+        "y": 130
       },
       "id": 270,
       "options": {
@@ -4350,7 +5039,7 @@
           },
           "expr": "mactop_cpu_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "CPU %",
+          "legendFormat": "CPU % \u00b7 {{instance}}",
           "refId": "A"
         },
         {
@@ -4360,7 +5049,7 @@
           },
           "expr": "mactop_gpu_usage_percent{job=~\"$job\",instance=~\"$instance\"}",
           "instant": false,
-          "legendFormat": "GPU %",
+          "legendFormat": "GPU % \u00b7 {{instance}}",
           "refId": "B"
         },
         {
@@ -4370,7 +5059,7 @@
           },
           "expr": "mactop_power_watts{job=~\"$job\",instance=~\"$instance\",component=\"total\"}",
           "instant": false,
-          "legendFormat": "Power W",
+          "legendFormat": "Power W \u00b7 {{instance}}",
           "refId": "C"
         }
       ],
@@ -4443,31 +5132,6 @@
         "regexApplyTo": "value",
         "sort": 1,
         "type": "query"
-      },
-      {
-        "current": {
-          "selected": false,
-          "text": "128",
-          "value": "128"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${datasource}"
-        },
-        "definition": "query_result(mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"total\"})",
-        "hide": 2,
-        "includeAll": false,
-        "multi": false,
-        "name": "memory_total",
-        "query": {
-          "query": "query_result(mactop_memory_gb{job=~\"$job\",instance=~\"$instance\",type=\"total\"})",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 2,
-        "regex": "/(?:\\}|mactop_memory_gb) +([0-9]+)/",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
       }
     ]
   },
@@ -4479,6 +5143,6 @@
   "timezone": "browser",
   "title": "mactop Exporter Full \u2014 Apple Silicon Mac",
   "uid": "mactop-apple-silicon-v5",
-  "version": 4,
+  "version": 5,
   "weekStart": ""
 }
